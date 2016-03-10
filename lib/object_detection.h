@@ -1,5 +1,9 @@
 #ifndef HEADER_OBJECT_DETECTION
 #define HEADER_OBJECT_DETECTION
+//object detection library
+//author: xun changqing
+//2016.3.10
+//email: xunchangqing AT qq.com
 
 #ifdef __cplusplus
 extern "C" {
