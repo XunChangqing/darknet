@@ -1,16 +1,16 @@
 OPENCV=1
 DEBUG=0
 
-VPATH=../src/
+#VPATH=../src/
 EXEC=test
 OBJDIR=./obj/
 
 CC=gcc
 OPTS=-Ofast
 #LDFLAGS= -lm -pthread -lstdc++ 
-LDFLAGS= -lm -lstdc++ -L../build -lobject_detection
+LDFLAGS= -lm -lstdc++ -L./lib -lobject_detection
 COMMON= 
-CFLAGS=-Wall -Wfatal-errors -I../
+CFLAGS=-Wall -Wfatal-errors -I./lib
 
 ifeq ($(DEBUG), 1) 
 OPTS=-O0 -g

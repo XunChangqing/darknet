@@ -1,3 +1,6 @@
+#include <time.h>
+#include <stdio.h>
+
 #include "opencv2/highgui/highgui_c.h"
 #include "object_detection.h"
 
@@ -11,7 +14,7 @@ int main()
     //给定文件名，sdk自行加载并检测
     time=clock();
     obj_num = detector_process_file(detector, "test_images/person.jpg", objects);
-    printf("Detected in %f seconds.\n", sec(clock()-time));
+    printf("Detected in %f seconds.\n", (double)(clock()-time)/CLOCKS_PER_SEC);
     int *objs = objects;
     int j;
     for(j=0;j<obj_num;j++)
@@ -44,7 +47,7 @@ int main()
     cvReleaseImage(&src);
     time=clock();
     obj_num = detector_process_buffer(detector, img_buf, w, h, objects);
-    printf("Detected in %f seconds.\n", sec(clock()-time));
+    printf("Detected in %f seconds.\n", (double)(clock()-time)/CLOCKS_PER_SEC);
     int *objs = objects;
     for(j=0;j<obj_num;j++)
     {
