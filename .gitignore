@@ -3,6 +3,7 @@
 *.csv
 *.out
 *.png
+*.ropeproject
 mnist/
 data/
 caffe/

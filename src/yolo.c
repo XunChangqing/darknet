@@ -9,8 +9,10 @@
 #include "opencv2/highgui/highgui_c.h"
 #endif
 
-char *voc_names[] = {"aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"};
-image voc_labels[20];
+/*char *voc_names[] = {"aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"};*/
+/*image voc_labels[20];*/
+char *voc_names[] = {"person", "person_atm_face", "person_atm_card", "person_night", "person_atm_face_night", "person_atm_card_night"};
+image *voc_labels = NULL;
 
 void train_yolo(char *cfgfile, char *weightfile)
 {
@@ -301,6 +303,7 @@ void validate_yolo_recall(char *cfgfile, char *weightfile)
         }
 
         fprintf(stderr, "%5d %5d %5d\tRPs/Img: %.2f\tIOU: %.2f%%\tRecall:%.2f%%\n", i, correct, total, (float)proposals/(i+1), avg_iou*100/total, 100.*correct/total);
+        proposals - correct; //false error
         free(id);
         free_image(orig);
         free_image(sized);
@@ -406,11 +409,11 @@ void demo_yolo(char *cfgfile, char *weightfile, float thresh, int cam_index)
 void run_yolo(int argc, char **argv)
 {
     int i;
-    for(i = 0; i < 20; ++i){
-        char buff[256];
-        sprintf(buff, "data/labels/%s.png", voc_names[i]);
-        voc_labels[i] = load_image_color(buff, 0, 0);
-    }
+    /*for(i = 0; i < 20; ++i){*/
+        /*char buff[256];*/
+        /*sprintf(buff, "data/labels/%s.png", voc_names[i]);*/
+        /*voc_labels[i] = load_image_color(buff, 0, 0);*/
+    /*}*/
 
     float thresh = find_float_arg(argc, argv, "-thresh", .2);
     int cam_index = find_int_arg(argc, argv, "-c", 0);
