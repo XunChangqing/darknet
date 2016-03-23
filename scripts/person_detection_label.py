@@ -6,8 +6,8 @@ from os.path import join
 
 # sets=[('2012', 'train'), ('2012', 'val'), ('2007', 'train'), ('2007', 'val'), ('2007', 'test')]
 bank_name = "bankcs"
-sets=[('day1', 'train'), ('day1', 'val'), ('day2', 'train'), ('day2', 'val'),
-      ('night1', 'train'), ('night1', 'val')]
+sets=[('day1', 'train'), ('day1', 'val'), ('day1', 'unannotated'),
+      ('night1', 'train'), ('night1', 'val'), ('night1', 'unannotated')]
 
 # classes = ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
 classes = ["person", "person_atm_face", "person_atm_card", "person_night",

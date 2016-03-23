@@ -243,12 +243,12 @@ void validate_yolo_recall(char *cfgfile, char *weightfile)
     int side = l.side;
 
     int j, k;
-    FILE **fps = calloc(classes, sizeof(FILE *));
-    for(j = 0; j < classes; ++j){
-        char buff[1024];
-        snprintf(buff, 1024, "%s%s.txt", base, voc_names[j]);
-        fps[j] = fopen(buff, "w");
-    }
+    /*FILE **fps = calloc(classes, sizeof(FILE *));*/
+    /*for(j = 0; j < classes; ++j){*/
+        /*char buff[1024];*/
+        /*snprintf(buff, 1024, "%s%s.txt", base, voc_names[j]);*/
+        /*fps[j] = fopen(buff, "w");*/
+    /*}*/
     box *boxes = calloc(side*side*l.n, sizeof(box));
     float **probs = calloc(side*side*l.n, sizeof(float *));
     for(j = 0; j < side*side*l.n; ++j) probs[j] = calloc(classes, sizeof(float *));
