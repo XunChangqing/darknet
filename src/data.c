@@ -84,9 +84,14 @@ matrix load_image_paths(char **paths, int n, int w, int h)
 
 box_label *read_boxes(char *filename, int *n)
 {
-    box_label *boxes = calloc(1, sizeof(box_label));
     FILE *file = fopen(filename, "r");
-    if(!file) file_error(filename);
+    /*if(!file) file_error(filename);*/
+    if(!file) 
+    {
+      *n = 0;
+      return NULL;
+    }
+    box_label *boxes = calloc(1, sizeof(box_label));
     float x, y, h, w;
     int id;
     int count = 0;

@@ -85,6 +85,9 @@ void train_yolo(char *cfgfile, char *weightfile)
     save_weights(net, buff);
 }
 
+/*predictions: 先是side*side(classes+num)，每个框预测一组类的概率，以及每个两个boundingbox为物体的概率，后面跟着side*side*cords(4)*num(2),每个框预测两个boundingbox，每个boundingbox四个坐标参数*/
+/*w,h: 输出时使用的宽和高，原始值为0-1的比例，如果这里w和h给1，则表示输出仍然为比例，如果给真实图像宽高，则输出为真实宽高和坐标*/
+/*only_objectness: 0位置直接输出可能为物体的概率，而不管具体类型，仅仅用于物体的recall计算*/
 void convert_yolo_detections(float *predictions, int classes, int num, int square, int side, int w, int h, float thresh, float **probs, box *boxes, int only_objectness)
 {
     int i,j,n;
@@ -223,6 +226,9 @@ void validate_yolo(char *cfgfile, char *weightfile)
     fprintf(stderr, "Total Detection Time: %f Seconds\n", (double)(time(0) - start));
 }
 
+/*原始的recall计算只考虑每个框为物体的概率，只要物体能够recall则仍然recall，不考虑物体类型*/
+/*所以代码中将第一类物体的概率直接赋值为对应boundingbox为object的概率*/
+/*现在修改为指定类型recall的能力*/
 void validate_yolo_recall(char *cfgfile, char *weightfile)
 {
     network net = parse_network_cfg(cfgfile);
@@ -242,7 +248,7 @@ void validate_yolo_recall(char *cfgfile, char *weightfile)
     int square = l.sqrt;
     int side = l.side;
 
-    int j, k;
+    int j, k, c;
     /*FILE **fps = calloc(classes, sizeof(FILE *));*/
     /*for(j = 0; j < classes; ++j){*/
         /*char buff[1024];*/
@@ -256,7 +262,8 @@ void validate_yolo_recall(char *cfgfile, char *weightfile)
     int m = plist->size;
     int i=0;
 
-    float thresh = .001;
+    /*float thresh = .001;*/
+    float thresh = .2;
     float iou_thresh = .5;
     float nms = 0;
 
@@ -271,7 +278,8 @@ void validate_yolo_recall(char *cfgfile, char *weightfile)
         image sized = resize_image(orig, net.w, net.h);
         char *id = basecfg(path);
         float *predictions = network_predict(net, sized.data);
-        convert_yolo_detections(predictions, classes, l.n, square, side, 1, 1, thresh, probs, boxes, 1);
+        /*convert_yolo_detections(predictions, classes, l.n, square, side, 1, 1, thresh, probs, boxes, 1);*/
+        convert_yolo_detections(predictions, classes, l.n, square, side, 1, 1, thresh, probs, boxes, 0);
         if (nms) do_nms(boxes, probs, side*side*l.n, 1, nms);
 
         char *labelpath = find_replace(path, "images", "labels");
@@ -280,6 +288,8 @@ void validate_yolo_recall(char *cfgfile, char *weightfile)
         labelpath = find_replace(labelpath, ".JPEG", ".txt");
 
         int num_labels = 0;
+        /*注意此处读取的是脚本生成的label文件，其中boundingbox为相对尺度*/
+        /*所以上面调用convert_yolo_detections的w和h设置为1*/
         box_label *truth = read_boxes(labelpath, &num_labels);
         for(k = 0; k < side*side*l.n; ++k){
             if(probs[k][0] > thresh){
@@ -292,8 +302,13 @@ void validate_yolo_recall(char *cfgfile, char *weightfile)
             float best_iou = 0;
             for(k = 0; k < side*side*l.n; ++k){
                 float iou = box_iou(boxes[k], t);
-                if(probs[k][0] > thresh && iou > best_iou){
+                /*这里任意物体的概率超过阈值都认为正确recall*/
+                /*这仅仅针对所有类别都是行人的情况*/
+                for(c = 0; c < l.classes; ++c)
+                {
+                  if(probs[k][c] > thresh && iou > best_iou){
                     best_iou = iou;
+                  }
                 }
             }
             avg_iou += best_iou;
