@@ -28,24 +28,27 @@ def convert(size, box):
     return (x,y,w,h)
 
 def convert_annotation(time, image_id):
-    in_file = open('%s/%s/Annotations/%s.xml'%(bank_name, time, image_id))
-    out_file = open('%s/%s/labels/%s.txt'%(bank_name, time, image_id), 'w')
-    tree=ET.parse(in_file)
-    root = tree.getroot()
-    size = root.find('size')
-    w = int(size.find('width').text)
-    h = int(size.find('height').text)
+    try:
+        in_file = open('%s/%s/Annotations/%s.xml'%(bank_name, time, image_id))
+        out_file = open('%s/%s/labels/%s.txt'%(bank_name, time, image_id), 'w')
+        tree=ET.parse(in_file)
+        root = tree.getroot()
+        size = root.find('size')
+        w = int(size.find('width').text)
+        h = int(size.find('height').text)
 
-    for obj in root.iter('object'):
-        difficult = obj.find('difficult').text
-        cls = obj.find('name').text
-        if cls not in classes or int(difficult) == 1:
-            continue
-        cls_id = classes.index(cls)
-        xmlbox = obj.find('bndbox')
-        b = (float(xmlbox.find('xmin').text), float(xmlbox.find('xmax').text), float(xmlbox.find('ymin').text), float(xmlbox.find('ymax').text))
-        bb = convert((w,h), b)
-        out_file.write(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
+        for obj in root.iter('object'):
+            difficult = obj.find('difficult').text
+            cls = obj.find('name').text
+            if cls not in classes or int(difficult) == 1:
+                continue
+            cls_id = classes.index(cls)
+            xmlbox = obj.find('bndbox')
+            b = (float(xmlbox.find('xmin').text), float(xmlbox.find('xmax').text), float(xmlbox.find('ymin').text), float(xmlbox.find('ymax').text))
+            bb = convert((w,h), b)
+            out_file.write(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
+    except:
+        pass
 
 wd = getcwd()
 
