@@ -6,6 +6,7 @@ from os.path import isfile, join, basename
 import glob
 import random
 
+
 # sets=[('2012', 'train'), ('2012', 'val'), ('2007', 'train'), ('2007', 'val'), ('2007', 'test')]
 bank_name = "bankcs"
 sets=['day1', 'night1']
