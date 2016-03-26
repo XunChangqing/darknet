@@ -302,13 +302,11 @@ void validate_yolo_recall(char *cfgfile, char *weightfile)
             float best_iou = 0;
             for(k = 0; k < side*side*l.n; ++k){
                 float iou = box_iou(boxes[k], t);
-                /*这里任意物体的概率超过阈值都认为正确recall*/
-                /*这仅仅针对所有类别都是行人的情况*/
-                for(c = 0; c < l.classes; ++c)
-                {
-                  if(probs[k][c] > thresh && iou > best_iou){
-                    best_iou = iou;
-                  }
+                /*取概率最大的物体类型*/
+                int class = max_index(probs[k], classes);
+                /*任意类型都认为是正确的*/
+                if(probs[k][class] > thresh && iou > best_iou){
+                  best_iou = iou;
                 }
             }
             avg_iou += best_iou;
