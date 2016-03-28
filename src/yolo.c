@@ -280,6 +280,12 @@ void validate_yolo_recall(char *cfgfile, char *weightfile)
         float *predictions = network_predict(net, sized.data);
         /*convert_yolo_detections(predictions, classes, l.n, square, side, 1, 1, thresh, probs, boxes, 1);*/
         convert_yolo_detections(predictions, classes, l.n, square, side, 1, 1, thresh, probs, boxes, 0);
+        for(k = 0; k < side*side*l.n; ++k){
+          int class = max_index(probs[k], classes);
+          float max_prob = probs[k][class];
+          probs[k][class] = 0.0f;
+          probs[k][class] = max_prob;
+        }
         if (nms) do_nms(boxes, probs, side*side*l.n, 1, nms);
 
         char *labelpath = find_replace(path, "images", "labels");
@@ -302,10 +308,7 @@ void validate_yolo_recall(char *cfgfile, char *weightfile)
             float best_iou = 0;
             for(k = 0; k < side*side*l.n; ++k){
                 float iou = box_iou(boxes[k], t);
-                /*取概率最大的物体类型*/
-                int class = max_index(probs[k], classes);
-                /*任意类型都认为是正确的*/
-                if(probs[k][class] > thresh && iou > best_iou){
+                if(probs[k][0] > thresh && iou > best_iou){
                   best_iou = iou;
                 }
             }
