@@ -77,7 +77,7 @@ int write_out_detections(int num, float thresh, box *boxes, float **probs, int c
   return obj_idx;
 }
 
-void* detector_init(char *cfg_file, char *weight_file)
+void* detector_init(const char *cfg_file, const char *weight_file)
 {
   gpu_index = 0;
   network net = parse_network_cfg(cfg_file);

@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 //初始化检测器，检测器以void指针类型返回，该指针后续的调用都需要
-void* detector_init(char *cfg_file, char *weight_file);
+void* detector_init(const char *cfg_file, const char *weight_file);
 //最多返回10个物体，每个物体的x，y（左上角坐标），w，h（宽和高），class（类型，0为人员，1为车辆）
 //objects: x,y,w,h,class(0-person, 1-car)
 #define MAX_OBJECTS (10)
