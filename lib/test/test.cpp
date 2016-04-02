@@ -17,7 +17,7 @@ int main() {
   //Mat src;
   //while (vcap.read(src)) {
   {
-    Mat src = imread("../../../screenshot/3.jpeg");
+    Mat src = imread("../../../screenshot/1.jpeg");
     //给定图像所存储的缓存，sdk负责检测
     //使用CV加载图像以后，需要进行处理，算法接受float类型的图像数据
     // Mat src = imread("test_images/person.jpg");

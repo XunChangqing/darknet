@@ -53,8 +53,12 @@ int write_out_detections(int num, float thresh, box *boxes, float **probs,
   for (i = 0; i < num; ++i) {
     int class = max_index(probs[i], classes);
     float prob = probs[i][class];
-    /*if (prob > thresh && obj_idx < MAX_OBJECTS && (class == 6 || class == 14)) {*/
-    if (prob > thresh && obj_idx < MAX_OBJECTS && class == 0) {
+    if (prob > thresh)
+      printf("probs: %f %f", probs[i][0], probs[i][6]);
+    /*if (prob > thresh && obj_idx < MAX_OBJECTS && (class == 6 || class == 14))
+     * {*/
+    /*if (prob > thresh && obj_idx < MAX_OBJECTS && class == 0) {*/
+    if (probs[i][0] > thresh && obj_idx < MAX_OBJECTS) {
       box b = boxes[i];
 
       int left = (b.x - b.w / 2.) * w;
@@ -100,7 +104,7 @@ void *detector_init(const char *cfg_file, const char *weight_file) {
 int detector_process_image(void *pnetwork, image im, int *objects) {
   network net = *(network *)pnetwork;
   detection_layer l = net.layers[net.n - 1];
-  int j,k;
+  int j, k;
   float nms = .5;
   float thresh = .2;
   box *boxes = calloc(l.side * l.side * l.n, sizeof(box));
