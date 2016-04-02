@@ -21,17 +21,20 @@ configure_file(config.h.in "${CMAKE_CURRENT_BINARY_DIR}/config.h" @ONLY)
 
 OPTION(USE_GPU "Use GPU" ON) # Enabled by default
 IF(USE_GPU)
-ADD_DEFINITIONS(-DGPU=1)
+  ADD_DEFINITIONS(-DGPU=1)
 ENDIF(USE_GPU)
 
 find_package(CUDA)
 SET(CUDA_NVCC_FLAGS "--gpu-architecture=compute_20 --gpu-code=compute_20" CACHE STRING "nvcc flags" FORCE)
 #CFLAGS+= -DGPU
 #cuda_compile(../src/convolutional_kernels.cu ../src/deconvolutional_kernels.cu ../src/activation_kernels.cu ../src/im2col_kernels.cu ../src/col2im_kernels.cu ../src/blas_kernels.cu ../src/crop_layer_kernels.cu ../src/dropout_layer_kernels.cu ../src/maxpool_layer_kernels.cu ../src/softmax_layer_kernels.cu ../src/network_kernels.cu ../src/avgpool_layer_kernels.cu ../src/gemm.c ../src/utils.c ../src/cuda.c ../src/deconvolutional_layer.c ../src/convolutional_layer.c)
-cuda_add_library(object_detection_srzn SHARED ../src/convolutional_kernels.cu ../src/deconvolutional_kernels.cu ../src/activation_kernels.cu ../src/im2col_kernels.cu ../src/col2im_kernels.cu ../src/blas_kernels.cu ../src/crop_layer_kernels.cu ../src/dropout_layer_kernels.cu ../src/maxpool_layer_kernels.cu ../src/softmax_layer_kernels.cu ../src/network_kernels.cu ../src/avgpool_layer_kernels.cu ../src/gemm.c ../src/utils.c ../src/cuda.c ../src/deconvolutional_layer.c ../src/convolutional_layer.c ../src/list.c ../src/image.c ../src/activations.c ../src/im2col.c ../src/col2im.c ../src/blas.c ../src/crop_layer.c ../src/dropout_layer.c ../src/maxpool_layer.c ../src/softmax_layer.c ../src/matrix.c ../src/network.c ../src/connected_layer.c ../src/cost_layer.c ../src/parser.c ../src/detection_layer.c ../src/route_layer.c ../src/box.c ../src/normalization_layer.c ../src/avgpool_layer.c ../src/layer.c ../src/local_layer.c ../src/shortcut_layer.c ../src/activation_layer.c ../src/rnn_layer.c ../src/option_list.c ../src/data.c object_detection.c object_detection.h config.h.in)
-# Create a library called "Hello" which includes the source file "hello.cxx".
-# The extension is already found. Any number of sources could be listed here.
-#add_library (object_detection_srzn SHARED ../src/convolutional_kernels.cu ../src/list.c ../src/image.c ../src/activations.c ../src/im2col.c ../src/col2im.c ../src/blas.c ../src/crop_layer.c ../src/dropout_layer.c ../src/maxpool_layer.c ../src/softmax_layer.c ../src/matrix.c ../src/network.c ../src/connected_layer.c ../src/cost_layer.c ../src/parser.c ../src/detection_layer.c ../src/route_layer.c ../src/box.c ../src/normalization_layer.c ../src/avgpool_layer.c ../src/layer.c ../src/local_layer.c ../src/shortcut_layer.c ../src/activation_layer.c ../src/rnn_layer.c ../src/option_list.c ../src/data.c object_detection.c)
+IF(USE_GPU)
+  cuda_add_library(object_detection_srzn SHARED ../src/convolutional_kernels.cu ../src/deconvolutional_kernels.cu ../src/activation_kernels.cu ../src/im2col_kernels.cu ../src/col2im_kernels.cu ../src/blas_kernels.cu ../src/crop_layer_kernels.cu ../src/dropout_layer_kernels.cu ../src/maxpool_layer_kernels.cu ../src/softmax_layer_kernels.cu ../src/network_kernels.cu ../src/avgpool_layer_kernels.cu ../src/gemm.c ../src/utils.c ../src/cuda.c ../src/deconvolutional_layer.c ../src/convolutional_layer.c ../src/list.c ../src/image.c ../src/activations.c ../src/im2col.c ../src/col2im.c ../src/blas.c ../src/crop_layer.c ../src/dropout_layer.c ../src/maxpool_layer.c ../src/softmax_layer.c ../src/matrix.c ../src/network.c ../src/connected_layer.c ../src/cost_layer.c ../src/parser.c ../src/detection_layer.c ../src/route_layer.c ../src/box.c ../src/normalization_layer.c ../src/avgpool_layer.c ../src/layer.c ../src/local_layer.c ../src/shortcut_layer.c ../src/activation_layer.c ../src/rnn_layer.c ../src/option_list.c ../src/data.c object_detection.c object_detection.h config.h.in)
+ELSE(USE_GPU)
+  # Create a library called "Hello" which includes the source file "hello.cxx".
+  # The extension is already found. Any number of sources could be listed here.
+  cuda_add_library(object_detection_srzn SHARED ../src/gemm.c ../src/utils.c ../src/cuda.c ../src/deconvolutional_layer.c ../src/convolutional_layer.c ../src/list.c ../src/image.c ../src/activations.c ../src/im2col.c ../src/col2im.c ../src/blas.c ../src/crop_layer.c ../src/dropout_layer.c ../src/maxpool_layer.c ../src/softmax_layer.c ../src/matrix.c ../src/network.c ../src/connected_layer.c ../src/cost_layer.c ../src/parser.c ../src/detection_layer.c ../src/route_layer.c ../src/box.c ../src/normalization_layer.c ../src/avgpool_layer.c ../src/layer.c ../src/local_layer.c ../src/shortcut_layer.c ../src/activation_layer.c ../src/rnn_layer.c ../src/option_list.c ../src/data.c object_detection.c object_detection.h config.h.in)
+ENDIF(USE_GPU)
 
 #message(STATUS ${CUDA_LIBRARIES})
 # Make sure the compiler can find include files for our Hello library
@@ -53,10 +56,11 @@ install(TARGETS object_detection_srzn
   PUBLIC_HEADER DESTINATION "include"
   COMPONENT dev)
 
-find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
-add_executable(test test/test.cpp)
-target_link_libraries(test object_detection_srzn ${OpenCV_LIBRARIES})
+add_subdirectory(test)
+#find_package(OpenCV REQUIRED)
+#include_directories(${OpenCV_INCLUDE_DIRS})
+#add_executable(test test/test.cpp)
+#target_link_libraries(test object_detection_srzn ${OpenCV_LIBRARIES})
 
 
 install(FILES test/test.cpp

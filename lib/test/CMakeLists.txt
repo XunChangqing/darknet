@@ -16,5 +16,9 @@ set(ObjectDetectionSrzn_LIBRARIES "object_detection_srzn")
 #include_directories(${boost_INCLUDE_DIRS})
 
 add_executable(test test.cpp)
+IF(USE_GPU)
 target_link_libraries(test ${OpenCV_LIBRARIES} ${ObjectDetectionSrzn_LIBRARIES} ${CUDA_curand_LIBRARY} ${CUDA_CUBLAS_LIBRARIES})
+ELSE(USE_GPU)
+target_link_libraries(test ${OpenCV_LIBRARIES} ${ObjectDetectionSrzn_LIBRARIES} )
+ENDIF(USE_GPU)
 
