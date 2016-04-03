@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "parser.h"
 #include "box.h"
+#include "cuda.h"
 
 #ifdef OPENCV
 #include "opencv2/highgui/highgui_c.h"
@@ -53,7 +54,11 @@ int write_out_detections(int num, float thresh, box *boxes, float **probs,
   for (i = 0; i < num; ++i) {
     int class = max_index(probs[i], classes);
     float prob = probs[i][class];
-    /*if (prob > thresh && obj_idx < MAX_OBJECTS && (class == 6 || class == 14)) {*/
+    if(prob > thresh){
+      printf("ps: %f %f. ", probs[i][0], probs[i][6]);
+    }
+    /*if (prob > thresh && obj_idx < MAX_OBJECTS && (class == 6 || class == 14))
+     * {*/
     if (prob > thresh && obj_idx < MAX_OBJECTS && class == 0) {
       box b = boxes[i];
 
@@ -81,11 +86,14 @@ int write_out_detections(int num, float thresh, box *boxes, float **probs,
       objects = objects + 5;
     }
   }
+  printf("\n");
   return obj_idx;
 }
 
 void *detector_init(const char *cfg_file, const char *weight_file) {
   gpu_index = 0;
+  /*cudaError_t status = cudaSetDevice(0);*/
+  cudaSetDevice(0);
   network net = parse_network_cfg(cfg_file);
   if (weight_file) {
     load_weights(&net, weight_file);
@@ -97,20 +105,28 @@ void *detector_init(const char *cfg_file, const char *weight_file) {
   *ret_net = net;
   return (void *)ret_net;
 }
-int detector_process_image(void *pnetwork, image im, int *objects) {
+int detector_process_image(void *pnetwork, float* im, int *objects, int w, int h) {
+/*int detector_process_image(void *pnetwork, image im, int *objects, int w, int h) {*/
   network net = *(network *)pnetwork;
   detection_layer l = net.layers[net.n - 1];
-  int j,k;
+  int j, k;
   float nms = .5;
-  float thresh = .2;
+  /*float thresh = .2;*/
+  float thresh = .3;
   box *boxes = calloc(l.side * l.side * l.n, sizeof(box));
   float **probs = calloc(l.side * l.side * l.n, sizeof(float *));
   for (j = 0; j < l.side * l.side * l.n; ++j)
     probs[j] = calloc(l.classes, sizeof(float *));
 
-  image sized = resize_image(im, net.w, net.h);
-  float *X = sized.data;
+  clock_t time;
+  /*image sized = resize_image(im, net.w, net.h);*/
+  /*float *X = sized.data;*/
+  float *X = im;
+  /*float *X = im;*/
+  /*time = clock();*/
   float *predictions = network_predict(net, X);
+  /*printf("Predict in %f seconds.\n",*/
+         /*(double)(clock() - time) / CLOCKS_PER_SEC);*/
   convert_yolo_detections(predictions, l.classes, l.n, l.sqrt, l.side, 1, 1,
                           thresh, probs, boxes, 0);
 
@@ -126,10 +142,10 @@ int detector_process_image(void *pnetwork, image im, int *objects) {
   if (nms)
     do_nms_sort(boxes, probs, l.side * l.side * l.n, l.classes, nms);
   int obj_num = write_out_detections(l.side * l.side * l.n, thresh, boxes,
-                                     probs, l.classes, im.w, im.h, objects);
+                                     probs, l.classes, w, h, objects);
 
   free(boxes);
-  free_image(sized);
+  /*free_image(sized);*/
   for (j = 0; j < l.side * l.side * l.n; ++j)
     free(probs[j]);
   free(probs);
@@ -138,15 +154,16 @@ int detector_process_image(void *pnetwork, image im, int *objects) {
 
 int detector_process_buffer(void *detector, float *image_buffer, int w, int h,
                             int *objects) {
-  image im = float_to_image(w, h, 3, (float *)image_buffer);
-  return detector_process_image(detector, im, objects);
+  /*image im = float_to_image(448, 448, 3, (float *)image_buffer);*/
+  return detector_process_image(detector, image_buffer, objects, w, h);
+  /*return detector_process_image(detector, im, objects, w, h);*/
 }
 
-int detector_process_file(void *detector, char *filename, int *objects) {
-  image im = load_image_color(filename, 0, 0);
-  int ret = detector_process_image(detector, im, objects);
-  free_image(im);
-  return ret;
-}
+/*int detector_process_file(void *detector, char *filename, int *objects) {*/
+  /*image im = load_image_color(filename, 0, 0);*/
+  /*int ret = detector_process_image(detector, im, objects);*/
+  /*free_image(im);*/
+  /*return ret;*/
+/*}*/
 
 void detector_release(void *detector) {}

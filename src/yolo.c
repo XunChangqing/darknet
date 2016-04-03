@@ -239,8 +239,9 @@ void validate_yolo_recall(char *cfgfile, char *weightfile)
     fprintf(stderr, "Learning Rate: %g, Momentum: %g, Decay: %g\n", net.learning_rate, net.momentum, net.decay);
     srand(time(0));
 
-    char *base = "results/comp4_det_test_";
-    list *plist = get_paths("data/voc.2007.test");
+    /*char *base = "results/comp4_det_test_";*/
+    /*list *plist = get_paths("/home/mythxcq/work/person_detection_datasets/bankcs/val.txt");*/
+    list *plist = get_paths("/home/mythxcq/work/person_detection_datasets/bankcs/unannotated.txt");
     char **paths = (char **)list_to_array(plist);
 
     layer l = net.layers[net.n-1];
@@ -265,7 +266,7 @@ void validate_yolo_recall(char *cfgfile, char *weightfile)
     /*float thresh = .001;*/
     float thresh = .2;
     float iou_thresh = .5;
-    float nms = 0;
+    float nms = 0.5f;
 
     int total = 0;
     int correct = 0;
@@ -283,10 +284,27 @@ void validate_yolo_recall(char *cfgfile, char *weightfile)
         for(k = 0; k < side*side*l.n; ++k){
           int class = max_index(probs[k], classes);
           float max_prob = probs[k][class];
-          probs[k][class] = 0.0f;
-          probs[k][class] = max_prob;
+          for(c=0;c<classes;++c)
+            probs[k][c] = 0.0f;
+          probs[k][0] = max_prob;
         }
         if (nms) do_nms(boxes, probs, side*side*l.n, 1, nms);
+
+        int n;
+        int obj_exist = 0;
+        for(n = 0; n < l.side*l.side*l.n; ++n){
+          int class = max_index(probs[n], classes);
+          float prob = probs[n][class];
+          if(prob > thresh){
+            obj_exist = -1;
+          }
+        }
+        if(obj_exist)
+        {
+          draw_detections(orig, l.side*l.side*l.n, thresh, boxes, probs, voc_names, 0, l.classes);
+          show_image(orig, "predictions");
+          cvWaitKey(0);
+        }
 
         char *labelpath = find_replace(path, "images", "labels");
         labelpath = find_replace(labelpath, "JPEGImages", "labels");
@@ -319,7 +337,7 @@ void validate_yolo_recall(char *cfgfile, char *weightfile)
         }
 
         /*fprintf(stderr, "%5d %5d %5d\tRPs/Img: %.2f\tIOU: %.2f%%\tRecall:%.2f%%\n", i, correct, total, (float)proposals/(i+1), avg_iou*100/total, 100.*correct/total);*/
-        fprintf(stderr, "%5d %5d %5d %5d\tRPs/Img: %.2f\tIOU: %.2f%%\tRecall:%.2f%%\n", i, correct, total, proposals-correct, (float)proposals/(i+1), avg_iou*100/total, 100.*correct/total);
+        fprintf(stderr, "%5d %5d %5d %5d\tRPs/Img: %.2f\tIOU: %.2f%%\tRecall:%.2f\tFalse:%.2f%%\n", i, correct, total, proposals-correct, (float)proposals/(i+1), avg_iou*100/total, 100.*correct/total, 100.*(proposals-correct)/i);
         /*proposals - correct; //false error*/
         free(id);
         free_image(orig);
@@ -362,9 +380,17 @@ void test_yolo(char *cfgfile, char *weightfile, char *filename, float thresh)
         float *predictions = network_predict(net, X);
         printf("%s: Predicted in %f seconds.\n", input, sec(clock()-time));
         convert_yolo_detections(predictions, l.classes, l.n, l.sqrt, l.side, 1, 1, thresh, probs, boxes, 0);
+        int k,c;
+        for(k = 0; k < l.side*l.side*l.n; ++k){
+          int class = max_index(probs[k], l.classes);
+          float max_prob = probs[k][class];
+          for(c=0;c<l.classes;++c)
+            probs[k][c] = 0.0f;
+          probs[k][0] = max_prob;
+        }
         if (nms) do_nms_sort(boxes, probs, l.side*l.side*l.n, l.classes, nms);
         //draw_detections(im, l.side*l.side*l.n, thresh, boxes, probs, voc_names, voc_labels, 20);
-        draw_detections(im, l.side*l.side*l.n, thresh, boxes, probs, voc_names, 0, 20);
+        draw_detections(im, l.side*l.side*l.n, thresh, boxes, probs, voc_names, 0, l.classes);
         show_image(im, "predictions");
         save_image(im, "predictions");
 
