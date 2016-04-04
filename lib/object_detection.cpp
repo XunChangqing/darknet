@@ -140,8 +140,8 @@ vector<ObjectDetector::Object> ObjectDetector::Process(const Mat &img) {
   detection_layer l = conv_net->layers[conv_net->n - 1];
   int j, k;
   float nms = .5;
-  float thresh = .2;
-  // float thresh = .3;
+  //float thresh = .2;
+  float thresh = .3;
   box *boxes = (box *)calloc(l.side * l.side * l.n, sizeof(box));
   float **probs = (float **)calloc(l.side * l.side * l.n, sizeof(float *));
   for (j = 0; j < l.side * l.side * l.n; ++j)

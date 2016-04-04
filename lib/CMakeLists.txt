@@ -45,7 +45,7 @@ target_include_directories (object_detection_srzn PRIVATE ../src ${CUDA_INCLUDE_
 target_link_libraries(object_detection_srzn m pthread ${CUDA_curand_LIBRARY} ${CUDA_CUBLAS_LIBRARIES})
 
 set_target_properties(object_detection_srzn PROPERTIES
-  PUBLIC_HEADER "object_detection.h;${CMAKE_CURRENT_BINARY_DIR}/config.h"
+  PUBLIC_HEADER "object_detection.hpp;${CMAKE_CURRENT_BINARY_DIR}/config.h"
   VERSION ${OBJECT_DETECTION_SRZN_VERSION})
 
 #add_subdirectory(test)
