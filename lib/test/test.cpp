@@ -16,8 +16,8 @@ using namespace std;
 using namespace srzn_object_detection;
 int main() {
   ObjectDetector object_detector(
-      "../../../weights_models_ours/yolo_7c.cfg",
-      "../../../weights_models_ours/yolo_7c_28000.weights");
+      "../../../models_object_detection/yolo_7c.cfg",
+      "../../../models_object_detection/yolo_7c_28000.weights");
   VideoCapture vcap("../../../haoyun_atm_videos/atm_env_1.avi");
   Mat src;
   int i = 0;
