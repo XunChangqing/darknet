@@ -1,5 +1,6 @@
+
 #ifdef __cplusplus
-extern "C" {
+extern "C"{
 #endif
 
 #include "network.h"
@@ -8,7 +9,6 @@ extern "C" {
 #include "utils.h"
 #include "parser.h"
 #include "box.h"
-#include "cuda.h"
 
 #ifdef __cplusplus
 }
@@ -17,6 +17,8 @@ extern "C" {
 #include "opencv2/opencv.hpp"
 
 #include "object_detection.hpp"
+
+
 
 // char *voc_names[] = {"aeroplane", "bicycle",   "bird",        "boat",
 //"bottle",    "bus",       "car",         "cat",
@@ -140,8 +142,8 @@ vector<ObjectDetector::Object> ObjectDetector::Process(const Mat &img) {
   detection_layer l = conv_net->layers[conv_net->n - 1];
   int j, k;
   float nms = .5;
-  float thresh = .2;
-  // float thresh = .3;
+  //float thresh = .2;
+  float thresh = .3;
   box *boxes = (box *)calloc(l.side * l.side * l.n, sizeof(box));
   float **probs = (float **)calloc(l.side * l.side * l.n, sizeof(float *));
   for (j = 0; j < l.side * l.side * l.n; ++j)

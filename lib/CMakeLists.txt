@@ -24,6 +24,7 @@ IF(USE_GPU)
   ADD_DEFINITIONS(-DGPU=1)
 ENDIF(USE_GPU)
 
+
 find_package(CUDA)
 SET(CUDA_NVCC_FLAGS "--gpu-architecture=compute_20 --gpu-code=compute_20" CACHE STRING "nvcc flags" FORCE)
 #CFLAGS+= -DGPU
