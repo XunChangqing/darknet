@@ -16,18 +16,17 @@ using namespace std;
 using namespace srzn_object_detection;
 int main() {
   ObjectDetector object_detector(
-      "../../../models_object_detection/yolo_7c.cfg",
-      "../../../models_object_detection/yolo_7c_28000.weights");
+      "../../../models_object_detection/7c.cfg",
+      "../../../models_object_detection/7c_28000.weights");
   VideoCapture vcap("../../../haoyun_atm_videos/atm_env_1.avi");
   Mat src;
   int i = 0;
   clock_t time;
-  // while (vcap.read(src)) {
-  {
-    // if(i++%(25*60) != 0)
-    // continue;
+  while (vcap.read(src)) {
+    if (i++ % (25) != 0)
+      continue;
     // imwrite("atm_env_1/"+SSTR(i)+".jpg", src);
-    Mat src = imread("../../../screenshot/1.jpeg");
+    // Mat src = imread("../../../screenshot/1.jpeg");
     time = clock();
 
     vector<ObjectDetector::Object> objs = object_detector.Process(src);
@@ -37,12 +36,12 @@ int main() {
     for (int j = 0; j < objs.size(); j++) {
       rectangle(src, objs[j].bounding_box, Scalar(200, 0, 0), 2);
       putText(src, SSTR(objs[j].probs),
-              Point(objs[j].bounding_box.x, objs[j].bounding_box.y+50),
+              Point(objs[j].bounding_box.x, objs[j].bounding_box.y + 50),
               CV_FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 250));
     }
     resize(src, src, Size(0, 0), 0.5f, 0.5f);
     imshow("src", src);
-    waitKey(0);
+    waitKey(1);
     // if (waitKey(30) > 0)
     // break;
   }

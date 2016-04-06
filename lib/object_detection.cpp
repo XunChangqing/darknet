@@ -1,5 +1,6 @@
+
 #ifdef __cplusplus
-extern "C" {
+extern "C"{
 #endif
 
 #include "network.h"
@@ -8,7 +9,6 @@ extern "C" {
 #include "utils.h"
 #include "parser.h"
 #include "box.h"
-#include "cuda.h"
 
 #ifdef __cplusplus
 }
@@ -17,6 +17,8 @@ extern "C" {
 #include "opencv2/opencv.hpp"
 
 #include "object_detection.hpp"
+
+
 
 // char *voc_names[] = {"aeroplane", "bicycle",   "bird",        "boat",
 //"bottle",    "bus",       "car",         "cat",
